@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Visualization Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.29.0/dist/apexcharts.min.css">
+  <style>
+    /* Dark theme styles */
+    body {
+      background-color: #1e202b;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: #394263;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+    }
+
+    .navbar ul li {
+      margin-right: 20px;
+      position: relative;
+    }
+
+    .navbar ul li label,
+    .navbar ul li select {
+      color: #fff;
+      font-size: 14px;
+      background-color: transparent;
+      border: 1px solid #5c6270;
+      border-radius: 5px;
+      padding: 8px 12px;
+    }
+
+    .chart-title {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .navbar ul li select {
+      appearance: none;
+    }
+
+    .navbar ul li select:hover {
+      background-color: #5c6270;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .select-container {
+      margin-bottom: 20px;
+    }
+    
+    .checkbox-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+    }
+    
+    input[type="checkbox"] {
+      display: none;
+    }
+    
+    input[type="checkbox"]+label {
+      cursor: pointer;
+      padding-left: 25px;
+      position: relative;
+    }
+    
+    input[type="checkbox"]+label:before {
+      content: '';
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #2196F3;
+      border-radius: 3px;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+    
+    input[type="checkbox"]:checked+label:before {
+      background-color: #2196F3;
+    }
+    
+    /* Style the dropdown button */
+.dropbtn {
+  background-color: #f1f1f1;
+  border: none;
+  color: #333;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Position the dropdown content */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Style the checkboxes and labels */
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+/* Style when checkbox is checked */
+input[type="checkbox"]:checked+label {
+  font-weight: bold;
+}
+
+/* Style when checkbox is checked */
+input[type="checkbox"]:checked+label:before {
+  content: '✔';
+  margin-right: 5px;
+  color: #2196F3;
+}
+
+
+.chart-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* 2 columns */
+      grid-template-rows: repeat(4, 1fr); /* 3 rows */
+      gap: 20px;
+      padding: 20px;
+    }
+    
+    .chart-item {
+      width: 100%; /* Adjust width as needed */
+      height: 100%; /* Adjust height as needed */
+      background-color: #394263;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    canvas {
+      width: 100%;
+      height: 300px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <form action="http://127.0.0.1:8000" method="post">
+    {% csrf_token %}
+    <nav class="navbar">
+      <ul>
+
+        <li>
+          <label for="intensity">End Year:</label>
+          <select id="intensity" name="endyear">
+          <option value="" selected disabled>Select End Year</option>
+  
+            {% for i in end_year%}
+            <option value={{i}} style="background-color: #4CAF50;">{{i}}</option>
+            {% endfor %}
+          </select>
+        </li>
+
+        <li>
+          <label for="intensity">Intensity:</label>
+          <select id="intensity" name="intensity">
+          <option value="" selected disabled>Select Intensity</option>
+
+            {% for i in intensities %}
+            <option value={{i}} style="background-color: #4CAF50;">{{i}}</option>
+            {% endfor %}
+          </select>
+        </li>
+        <li>
+          <label for="likelihood">Likelihood:</label>
+          <select id="likelihood" name="likelihood">
+            <option value="" selected disabled>Select Likelihood</option>
+            {% for i in likelihood %}
+            <option value={{i}} style="background-color: #2196F3;">{{i}}</option>
+            {% endfor %}
+          </select>
+        </li>
+
+
+     <li>
+        <label for="topic">topic:</label>
+        <select id="topic" name="topic">
+          <option value="" selected disabled>Select Topic</option>
+
+          {% for i in topics %}
+          <option value={{i}} style="background-color: #2196F3;">{{i}}</option>
+          {% endfor %}
+        </select>
+      </li> 
+      <li>
+        <label for="intensity">Region:</label>
+        <select id="region" name="region">
+        <option value="" selected disabled>Select Region</option>
+
+          {% for i in regions %}
+          <option value={{i}} style="background-color: #4CAF50;">{{i}}</option>
+          {% endfor %}
+        </select>
+      </li>
+        <!-- Add other filters similarly -->
+      </ul>
+      <button type="submit">Apply Filters</button>
+    </nav>
+  </form>
+
+  <div class="chart-container">
+    <div class="chart-item">
+      <div class="chart-title">Count Of Relevance </div>
+      <div id="chart1"></div>
+      <!-- Placeholder for the ApexCharts -->
+    </div>
+    <div class="chart-item">
+      <div class="chart-title">Count of Intensity </div>
+      <div id="chart2"></div>
+      <!-- Placeholder for another ApexChart -->
+    </div>
+    <div class="chart-item">
+      <div class="chart-title">Comparision of Relevancs,Intensity and likelihood</div>
+      <div id="chart6"></div>
+      <!-- Placeholder for the ApexCharts -->
+    </div>
+    <div class="chart-item">
+      <div class="chart-title">Count For End Year</div>
+      <div id="chart8"></div>
+      <!-- Placeholder for the ApexCharts -->
+    </div>
+    <div class="chart-item">
+      <div class="chart-title">Count For Pestle</div>
+      <div id="chart3"></div>
+      <!-- Placeholder for the ApexCharts -->
+    </div>
+    <div class="chart-item">
+      <div class="chart-title">Count For Sector</div>
+      <div id="chart4"></div>
+      <!-- Placeholder for the ApexCharts -->
+    </div>
+    <div class="chart-item">
+      <div class="chart-title">Count For Topics</div>
+      <div id="chart5"></div>
+      <!-- Placeholder for the ApexCharts -->
+    </div>
+    <div class="chart-item">
+      <div class="chart-title">Count For Region</div>
+      <div id="chart7"></div>
+      <!-- Placeholder for the ApexCharts -->
+    </div>
+
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.29.0/dist/apexcharts.min.js"></script>
+  <script>
+    var optionsBar = {
+      chart: {
+          type: 'bar',
+          foreColor: '#ddd',
+          background: '#394263',
+      },
+      series: [{
+          data: {{data_bar.values | safe }},
+      }],
+      xaxis: {
+          categories: {{ data_bar.labels | safe }},
+      },
+  };
+  
+  var chartBar = new ApexCharts(document.querySelector("#chart1"), optionsBar);
+  chartBar.render();
+
+
+
+  var options = {
+    chart: {
+      type: 'line',
+      foreColor: '#333',
+      background: '#fff',
+    },
+    series: [{
+      name: ' Intensity',
+      data: {{ data_intensity.values | safe }},
+    },{
+      name: 'Likelihood',
+      data: {{ data_likelihood.values | safe }},
+    }
+    ,{
+      name: 'Relevace',
+      data: {{ data_bar.values | safe }},
+    }],
+    
+    xaxis: {
+      categories: [],
+    },
+    // Other chart options and styling...
+  };
+  
+  var chart = new ApexCharts(document.querySelector("#chart6"), options);
+  chart.render();
+
+  var optionsBar = {
+    chart: {
+        type: 'bar',
+        foreColor: '#ddd',
+        background: '#394263',
+    },
+    series: [{
+        data: {{data_intensity.values | safe }},
+    }],
+    xaxis: {
+        categories: {{ data_intensity.labels | safe }},
+    },
+};
+
+var chartBar = new ApexCharts(document.querySelector("#chart2"), optionsBar);
+chartBar.render();
+
+
+var optionsBar = {
+  chart: {
+      type: 'bar',
+      foreColor: '#ddd',
+      background: '#394263',
+  },
+  series: [{
+      data: {{data_end_year.values | safe }},
+  }],
+  xaxis: {
+      categories: {{ data_end_year.labels | safe }},
+  },
+};
+
+var chartBar = new ApexCharts(document.querySelector("#chart8"), optionsBar);
+chartBar.render();
+
+    var optionsPie = {
+      chart: {
+        type: 'pie',
+        foreColor: '#ddd',
+        background: '#394263',
+        toolbar: {
+          show: true,
+          tools: {
+            download: false, // Hide the download tool
+          },
+        },
+        title: 'My Pie Chart Title',
+      },
+      series: {{data.values | safe}},
+      labels: {{data.labels | safe}},
+    };
+    
+    var chartPie = new ApexCharts(document.querySelector("#chart7"), optionsPie);
+
+
+    chartPie.render();
+    var optionsPie = {
+      chart: {
+        type: 'pie',
+        foreColor: '#ddd',
+        background: '#394263',
+        toolbar: {
+          show: true,
+          tools: {
+            download: false, // Hide the download tool
+          },
+        },
+        title: 'My Pie Chart Title',
+      },
+      series: {{data_pestles.values | safe}},
+      labels: {{data_pestles.labels | safe}},
+    };
+    var chartPie = new ApexCharts(document.querySelector("#chart3"), optionsPie);
+    chartPie.render();
+
+    
+    var optionsPie = {
+      chart: {
+        type: 'pie',
+        foreColor: '#ddd',
+        background: '#394263',
+        toolbar: {
+          show: true,
+          tools: {
+            download: false, // Hide the download tool
+          },
+        },
+        title: 'My Pie Chart Title',
+      },
+      series: {{data_sectors.values | safe}},
+      labels: {{data_sectors.labels | safe}},
+    };
+    
+    var chartPie = new ApexCharts(document.querySelector("#chart4"), optionsPie);
+    chartPie.render();
+    
+
+    var optionsPie = {
+      chart: {
+        type: 'pie',
+        foreColor: '#ddd',
+        background: '#394263',
+        toolbar: {
+          show: true,
+          tools: {
+            download: false, // Hide the download tool
+          },
+        },
+        title: 'My Pie Chart Title',
+      },
+      series: {{data_topics.values | safe}},
+      labels: {{data_topics.labels | safe}},
+    };
+    
+    var chartPie = new ApexCharts(document.querySelector("#chart5"), optionsPie);
+    chartPie.render();
+    
+  </script>
+</body>
+</html>
