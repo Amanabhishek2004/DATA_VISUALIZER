@@ -1,7 +1,5 @@
 
-### Additional Tips
-- **Markdown Syntax:** Use Markdown syntax effectively to format text, create lists, add links, and embed images.
-- **Consistent Style:** Maintain a consistent style and format throughout the README.
-- **Updates:** Keep the README up to date with changes in your project.
+### DATA VISUALIZER
+- **TASK:** I WAS GIVEN A BASIC JSON DATA I TRANSFORMED THAT DATA INTO A INTERACTIVE DASHBOARD WITH FILTERS AND CHARTS
 
-By following these guidelines, you can create a README that is not only informative but also visually appealing and easy to navigate.
+HERE IS THE VIDEO OF THE WORKING OF THIS PROJECT https://www.linkedin.com/feed/update/urn:li:activity:7149000742819868673/
